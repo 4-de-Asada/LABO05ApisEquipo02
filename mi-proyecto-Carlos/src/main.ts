@@ -99,68 +99,41 @@ const createNewPost = async (): Promise<void> => {
     console.error("❌ Fallo en Lab 2:", error);
   }
 };
-/*
-        ##################################################
-        EL RETO 
-        ##################################################
-*/
 
-/**
- * PASO 6: RETO DE RECURSOS ANIDADOS (Pistas y estructura)
- * Objetivo: Obtener los comentarios que pertenecen a un Post específico.
- */
-// PISTA A: Crea la interfaz 'Comment'. 
-// Recuerda que la API devuelve: postId, id, name, email y body.
 
-/**
- * PASO 7: FUNCIÓN DE BÚSQUEDA DE COMENTARIOS
- * Instrucciones:
- * 1. Usa la URL: ${API_URL}/posts/${id}/comments
- * 2. Recuerda que la respuesta es una LISTA (Array) de objetos Comment.
- * 3. Usa un bucle o método de array (como .forEach) para mostrar los datos.
- */
-/**
- * RETO DE LABORATORIO: Obtener recursos anidados (Comments)
- * * Instrucciones para el estudiante:
- * Sigue los pasos numerados para completar la función.
- */
+interface Comment {
+  postId: number;
+  id: number;
+  name: string;
+  email: string;
+  body: string;
+}
+
+
 const fetchCommentsByPost = async (postId: number): Promise<void> => {
   
-  // 1. [LOG]: Imprime en consola un mensaje avisando que vas a buscar 
-  // los comentarios del 'postId' recibido. Usa estilos %c si quieres.
+  console.log("%c [LAB 3] Buscando comentarios del post ID: {postId}...", "color: #00ffcc; font-weight: bold")
 
   try {
-    // 2. [PETICIÓN]: Crea una constante 'response'.
-    // Usa 'fetch' con backticks para unir API_URL + /posts/ + postId + /comments.
+    const response = await fetch("${API_URL}/posts/${postId}/comments");
     
+    if (!response.ok){
+      throw new Error("Error al cargar los comentarios. Status: ${response.status}");
+    }
 
-    // 3. [VALIDACIÓN]: Si la respuesta (response.ok) es falsa, 
-    // lanza un error (throw new Error) indicando que falló la carga.
+    const data: Comment[] = await response.json();
 
+    console.log("Se encontraron ${data.length} comentarios.");
 
-    // 4. [TRADUCCIÓN]: Crea una constante 'data'.
-    // Usa 'await response.json()' y asígnale el tipo 'Comment[]' (Array de comentarios).
-    
-
-    // 5. [PROCESAMIENTO]: Una vez tengas los datos, imprime cuántos comentarios llegaron.
-    // Tip: Usa data.length.
-
-
-    // 6. [RECORRIDO]: Usa un método de array (como .forEach) para recorrer la lista.
-    // Dentro, imprime solo el 'email' de cada comentario para verificar el tipado.
-
+    data.forEach(comment => {
+      console.log(`  📧 Email: ${comment.email}`);
+    });
 
   } catch (error) {
-    // 7. [ERRORES]: Captura el error y muéstralo con console.error.
+    console.error("Fallo en el Reto de comentarios: ", error);
   }
 };
 
-
-/**
- * PISTA FINAL DE EJECUCIÓN:
- * Dentro de tu función 'runLaboratory', no olvides añadir:
- * await fetchCommentsByPost(POST_ID_TO_SEARCH);
- */
 
 /*
     ################################################################################
@@ -202,7 +175,7 @@ interface Auto {
  * PASO 4: LA FUNCIÓN DE LECTURA (GET)
  * Esta función entra a la base de datos y trae los registros.
  */
-const getAutos = async (): Promise<void> => {
+const async = async (): Promise<void> => {
   
   // Realizamos la consulta: 
   // 1. .from('autos') -> Selecciona la tabla de tu imagen.
@@ -248,6 +221,8 @@ const runLaboratory = async () => {
   // Usamos await para que los logs salgan en orden y no se mezclen.
   await fetchSinglePost(POST_ID_TO_SEARCH); 
   await createNewPost();    
+
+  await fetchCommentsByPost(POST_ID_TO_SEARCH);
   //await getAutos();                
   
   console.log("%c --- EXPERIMENTO FINALIZADO ---", "background: #222; color: #bada55; padding: 5px;");
