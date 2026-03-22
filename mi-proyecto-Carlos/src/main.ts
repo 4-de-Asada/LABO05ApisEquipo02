@@ -1,4 +1,6 @@
+import { createClient } from '@supabase/supabase-js';
 /**
+ *
  * PASO 1: DATOS PRIMITIVOS (Configuración base)
  * Definimos valores básicos con tipado explícito para que el compilador sepa 
  * exactamente qué tipo de datos estamos manejando desde el inicio.
@@ -112,25 +114,25 @@ interface Comment {
 
 const fetchCommentsByPost = async (postId: number): Promise<void> => {
   
-  console.log("%c [LAB 3] Buscando comentarios del post ID: {postId}...", "color: #00ffcc; font-weight: bold")
+  console.log(`%c [LAB 3] Buscando comentarios del post ID: ${postId}...`, "color: #00ffcc; font-weight: bold;");
 
   try {
-    const response = await fetch("${API_URL}/posts/${postId}/comments");
+    const response = await fetch(`${API_URL}/posts/${postId}/comments`);
     
     if (!response.ok){
-      throw new Error("Error al cargar los comentarios. Status: ${response.status}");
+      throw new Error(`Error al cargar los comentarios. Status: ${response.status}`);
     }
 
     const data: Comment[] = await response.json();
 
-    console.log("Se encontraron ${data.length} comentarios.");
+    console.log(`Se encontraron ${data.length} comentarios.`);
 
     data.forEach(comment => {
       console.log(`  📧 Email: ${comment.email}`);
     });
 
   } catch (error) {
-    console.error("Fallo en el Reto de comentarios: ", error);
+    console.error(`Fallo en el Reto de comentarios: `, error);
   }
 };
 
@@ -150,8 +152,8 @@ const fetchCommentsByPost = async (postId: number): Promise<void> => {
  * PASO 1: CONFIGURACIÓN DE CONEXIÓN
  * Sustituye estos valores con los de tu proyecto en Supabase (Project Settings > API)
  */
-const SUPABASE_URL: string = "TU_URL_DE_SUPABASE";
-const SUPABASE_KEY: string = "TU_KEY";
+const SUPABASE_URL: string = "https://wrxuzgivscvrmlxqvcug.supabase.co";
+const SUPABASE_KEY: string = "sb_publishable_od6VMVvv-hB6G3CrcFVPVg_ydKp4v-e";
 
 /**
  * PASO 2: INICIALIZACIÓN DEL CLIENTE
@@ -159,23 +161,24 @@ const SUPABASE_KEY: string = "TU_KEY";
  */
 
 // DESCOMENTAR LA LINEA DE ABAJO
-// const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
+const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
 /**
  * PASO 3: INTERFAZ DE DATOS
  * Definimos la estructura exacta de la tabla que vemos en tu imagen.
  */
-interface Auto {
-  id_auto: number;       // Columna ID (Primary Key)
-  patente: string;       // Columna Patente (Varchar)
-  id_propietario: number; // Columna ID Propietario (Foreign Key)
+interface Estudiante {
+  matricula: number;
+  nombre: string;
+  email: string;
+  carrera: string;
 }
 
 /**
  * PASO 4: LA FUNCIÓN DE LECTURA (GET)
  * Esta función entra a la base de datos y trae los registros.
  */
-const async = async (): Promise<void> => {
+const getEstudiante = async (): Promise<void> => {
   
   // Realizamos la consulta: 
   // 1. .from('autos') -> Selecciona la tabla de tu imagen.
@@ -183,26 +186,23 @@ const async = async (): Promise<void> => {
 
   // DESCOMENTAR ESTAS LINEAS QUE SIGUEN
 
-  /*const { data, error } = await supabase
-    .from('autos')   
+  const { data, error } = await supabase
+    .from('estudiante')   
     .select('*');
 
   // Si Supabase responde con un error (ej: tabla inexistente o sin permisos RLS)
   if (error) {
-    console.error("❌ Error al obtener los autos:", error.message);
+    console.error("❌ Error al obtener los estudiantes:", error.message);
     return;
   }
 
   // Si todo sale bien, 'data' contiene el array de objetos.
   // Usamos 'as Auto[]' para decirle a TS que confíe en nuestra interfaz.
-  const listaAutos: Auto[] = data as Auto[];
+  const listaAutos: Estudiante[] = data as Estudiante[];
 
   // Mostramos el resultado final en la consola del navegador
-  console.log("✅ Lista de autos recibida:");
+  console.log("✅ Lista de estudiantes recibida:");
   console.table(listaAutos); 
-
-  HASTA AQUI DEBES DESCOMENTAR
-  */ 
 };
 
 
@@ -223,7 +223,8 @@ const runLaboratory = async () => {
   await createNewPost();    
 
   await fetchCommentsByPost(POST_ID_TO_SEARCH);
-  //await getAutos();                
+
+  await getEstudiante();                
   
   console.log("%c --- EXPERIMENTO FINALIZADO ---", "background: #222; color: #bada55; padding: 5px;");
 };
