@@ -51,7 +51,6 @@ const fetchSinglePost = async (id: number): Promise<void> => {
     const data: Post = await response.json();
 
     // Imprimimos el resultado accediendo a las propiedades definidas en la interfaz.
-    console.log(data);
     console.log("✅ Post recuperado:");
     console.log(`   - Título: ${data.title}`);
     console.log(`   - Cuerpo: ${data.body.substring(0, 50)}...`);
@@ -139,7 +138,7 @@ const fetchCommentsByPost = async (postId: number): Promise<void> => {
   // 1. [LOG]: Imprime en consola un mensaje avisando que vas a buscar 
   // los comentarios del 'postId' recibido. Usa estilos %c si quieres.
   if (IS_DEBUG_MODE) {
-    console.log(`%c [LOG] Buscando los comentarios del post con ID: ${postId}...`, "color: yellow; font-weight: bold;");
+    console.log(`%cBuscando los comentarios del post con ID: ${postId}...`, "color: yellow; font-weight: bold;");
   }
 
   try {
@@ -164,8 +163,9 @@ const fetchCommentsByPost = async (postId: number): Promise<void> => {
 
     // 6. [RECORRIDO]: Usa un método de array (como .forEach) para recorrer la lista.
     // Dentro, imprime solo el 'email' de cada comentario para verificar el tipado.
+    console.log(`Emails de los comentarios encontrados:`)
     data.forEach((comment) => {
-      console.log(comment.email);
+      console.log(`- ${comment.email}`);
     });
 
   } catch (error) {
@@ -192,12 +192,14 @@ const fetchCommentsByPost = async (postId: number): Promise<void> => {
 
  */
 
+import { createClient } from '@supabase/supabase-js';
+
 /**
  * PASO 1: CONFIGURACIÓN DE CONEXIÓN
  * Sustituye estos valores con los de tu proyecto en Supabase (Project Settings > API)
  */
-const SUPABASE_URL: string = "TU_URL_DE_SUPABASE";
-const SUPABASE_KEY: string = "TU_KEY";
+const SUPABASE_URL: string = "https://nwzurqmpvjtkzaxmptmw.supabase.co";
+const SUPABASE_KEY: string = "sb_publishable_B66z3kbAodTGXidxp8g4iw_teOOwT3o";
 
 /**
  * PASO 2: INICIALIZACIÓN DEL CLIENTE
@@ -205,23 +207,25 @@ const SUPABASE_KEY: string = "TU_KEY";
  */
 
 // DESCOMENTAR LA LINEA DE ABAJO
-// const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
+const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
 /**
  * PASO 3: INTERFAZ DE DATOS
  * Definimos la estructura exacta de la tabla que vemos en tu imagen.
  */
-interface Auto {
-  id_auto: number;       // Columna ID (Primary Key)
-  patente: string;       // Columna Patente (Varchar)
-  id_propietario: number; // Columna ID Propietario (Foreign Key)
+interface Profesor {
+  matriculaprofesor: number;
+  nombre: string;
+  apellidopaterno: string;
+  apellidomaterno: string;
+  email: string;
 }
 
 /**
  * PASO 4: LA FUNCIÓN DE LECTURA (GET)
  * Esta función entra a la base de datos y trae los registros.
  */
-const getAutos = async (): Promise<void> => {
+const getProfesores = async (): Promise<void> => {
   
   // Realizamos la consulta: 
   // 1. .from('autos') -> Selecciona la tabla de tu imagen.
@@ -229,26 +233,23 @@ const getAutos = async (): Promise<void> => {
 
   // DESCOMENTAR ESTAS LINEAS QUE SIGUEN
 
-  /*const { data, error } = await supabase
-    .from('autos')   
+  const { data, error } = await supabase
+    .from('profesor')   
     .select('*');
 
   // Si Supabase responde con un error (ej: tabla inexistente o sin permisos RLS)
   if (error) {
-    console.error("❌ Error al obtener los autos:", error.message);
+    console.error("❌ Error al obtener los profesores:", error.message);
     return;
   }
 
   // Si todo sale bien, 'data' contiene el array de objetos.
   // Usamos 'as Auto[]' para decirle a TS que confíe en nuestra interfaz.
-  const listaAutos: Auto[] = data as Auto[];
+  const listaProfesores: Profesor[] = data as Profesor[];
 
   // Mostramos el resultado final en la consola del navegador
-  console.log("✅ Lista de autos recibida:");
-  console.table(listaAutos); 
-
-  HASTA AQUI DEBES DESCOMENTAR
-  */ 
+  console.log("✅ Lista de profesores recibida:");
+  console.table(listaProfesores); 
 };
 
 
@@ -266,9 +267,9 @@ const runLaboratory = async () => {
   
   // Usamos await para que los logs salgan en orden y no se mezclen.
   await fetchSinglePost(POST_ID_TO_SEARCH);
-  await fetchCommentsByPost(POST_ID_TO_SEARCH);
   await createNewPost();
-  //await getAutos();                
+  await fetchCommentsByPost(POST_ID_TO_SEARCH);
+  await getProfesores();
   
   console.log("%c --- EXPERIMENTO FINALIZADO ---", "background: #222; color: #bada55; padding: 5px;");
 };
